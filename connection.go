@@ -9,11 +9,11 @@ import (
 //
 // Connections are unique to each user.
 func GetConnection(local string) (remote string, err error) {
-	letter, err := netresource.MakeDriveLetter(local)
+	local, err = netresource.MakeDriveLetter(local)
 	if err != nil {
 		return "", err
 	}
-	return wnetapi.GetConnection(letter + ":")
+	return wnetapi.GetConnection(local + ":")
 }
 
 // AddConnection attempts to map the given local name to a remote resource.
@@ -52,6 +52,12 @@ func AddConnection(local, remote string, persistent bool) (err error) {
 //
 // Connections are unique to each user.
 func RemoveConnection(name string, persistent, force bool) (err error) {
+	name, err = netresource.MakeDriveLetter(name)
+	if err != nil {
+		return err
+	}
+	name += ":"
+
 	var flags netresource.Option
 	if persistent {
 		flags |= netresource.ConnectUpdateProfile
